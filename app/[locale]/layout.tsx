@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
+import {getTranslations, unstable_setRequestLocale} from 'next-intl/server';
 
 const fontSans = Plus_Jakarta_Sans({ 
   subsets: ["latin"],
@@ -13,30 +14,44 @@ const fontSans = Plus_Jakarta_Sans({
   variable: '--font--sans'
 });
 
-export const metadata: Metadata = {
-  title: "CarePulse",
-  description: "A healthcare management system",
-};
+// export const metadata: Metadata = {
+//   title: "CarePulse",
+//   description: "A healthcare management system",
+// };
+
+export const metadata = (async () => {
+  const t = await getTranslations("common");
+  return {
+    title: t('app_name'),
+    description: t('app_description')
+  }
+})
 
 export default async function RootLayout({
   children,
+  params: {locale}
 }: Readonly<{
   children: React.ReactNode;
+  params: {locale: string};
 }>) {
 
+  // unstable_setRequestLocale(locale);
   const messages = await getMessages();
+
   return (
-    <NextIntlClientProvider messages={messages}>
-      <html lang="ja">
+    
+      <html lang={locale}>
         <body className={cn('min-h-screen bg-dark-300 font-sans antialiased', fontSans.variable)}>
-          <ThemeProvider
-              attribute="class"
-              defaultTheme="dark"
-            >
-              {children}
-          </ThemeProvider>
+          <NextIntlClientProvider messages={messages}>
+            <ThemeProvider
+                attribute="class"
+                defaultTheme="dark"
+              >
+                {children}
+            </ThemeProvider>
+          </NextIntlClientProvider>
         </body>
       </html>
-    </NextIntlClientProvider>
+ 
   );
 }

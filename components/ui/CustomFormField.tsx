@@ -14,6 +14,8 @@ import {
 import { FormFieldType } from "../forms/PatientForm"
 import Image from "next/image";
 
+import {useLocale} from 'next-intl';
+
 import 'react-phone-number-input/style.css'
 import PhoneInput from "react-phone-number-input";
 
@@ -31,10 +33,13 @@ interface CustomProps {
     renderSkeleton?: (field: any) => React.ReactNode;
     fieldType: FormFieldType;
   }
-  
+
+
+
 const RenderField = ({field, props}:{field:any, props: CustomProps}) => {
     const { fieldType, iconSrc, iconAlt, placeholder} = props;
-    console.log('field:',field);
+    const locale = useLocale();
+    console.log('locale:',locale);
     switch (props.fieldType) {
         case FormFieldType.INPUT:
           return (
@@ -72,7 +77,7 @@ const RenderField = ({field, props}:{field:any, props: CustomProps}) => {
           return (
             <FormControl>
               <PhoneInput
-                defaultCountry="JP"
+                defaultCountry={locale === 'ja'?"JP":"US"}
                 placeholder={props.placeholder}
                 international
                 withCountryCallingCode
