@@ -5,11 +5,16 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 
 //formコントロール
-import { Button } from "@/components/ui/button"
 import { Form } from "@/components/ui/form"
 import CustomFormField from "../ui/CustomFormField"
 import { useTranslations } from "next-intl"
-
+import SubmitButton from "../ui/SubmitButton"
+import { useState } from "react"
+import { UserFormValidation } from "@/lib/validation"
+import { useRouter } from "next/navigation"
+import { createUser } from "@/lib/actions/patient.actions"
+import * as sdk from "node-appwrite";
+import { ID, Query } from "node-appwrite";
 
 export enum FormFieldType {
   INPUT = "input",
@@ -20,32 +25,88 @@ export enum FormFieldType {
   SELECT = "select",
   SKELETON = "skeleton",
 }
-//Zod schemaでformの形状を定義
-const formSchema = z.object({
-  username: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
-  }),
-})
- 
+
+// //Zod schemaでformの形状を定義⇒validation.tsで定義
+// const formSchema = z.object({
+//   username: z.string().min(2, {
+//     message: "Username must be at least 2 characters.",
+//   }),
+// })
+
+// export const formSchema2 = (t: (key: string, options?: { field: string, length?: number }) => string) => {
+//   z.object({
+//       name: z
+//           .string()
+//           .min(2, t('validation.minLength',{ field: t('Name'), length: 2 }))
+//           .max(50, t('validation.maxLength', { field: t('Name'), length: 50 })),
+//       email: z.string().email(t('validation.invalid', { field: t('Email')})),
+//       phone: z
+//           .string()
+//           .refine((phone) => /^\+\d{10,15}$/.test(phone), t('validation.invalid', { field: 'Email'})),
+//   });
+// };
+
+
 const PatientForm = () => {
   const t = useTranslations("common");
+  const [isLoading, setIsLoading] = useState(false);
+  // const formSchema = UserFormValidation(t);
+  const router = useRouter();
 
   // 1. Define your form.
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof UserFormValidation>>({
+    resolver: zodResolver(UserFormValidation),
     defaultValues: {
-      username: "",
+      name: "",
+      email: "",
+      phone: "",
     },
   })
  
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    //入力されたformデータの検証
-    console.log(values)
+  async function onSubmit({name, email, phone}: z.infer<typeof UserFormValidation>) {
+     //入力されたformデータの検証
+    setIsLoading(true);
+    
+    try{
+      // const user = {
+      //   name: values.name,
+      //   email: values.email,
+      //   phone: values.phone,
+      // };
+      const userData = {name, email, phone}
+       
+      // console.log('NEXT_PUBLIC_ENDPOINT:',process.env.NEXT_PUBLIC_ENDPOINT);
+      // console.log('NEXT_PUBLIC_PROJECT_ID:',process.env.NEXT_PUBLIC_PROJECT_ID);
+      // console.log('NEXT_PUBLIC_API_KEY:',process.env.NEXT_PUBLIC_API_KEY);
+      // const client = new sdk.Client()
+      //     .setEndpoint(process.env.NEXT_PUBLIC_ENDPOINT) // Your API Endpoint
+      //     .setProject(process.env.NEXT_PUBLIC_PROJECT_ID) // Your project ID
+      //     .setKey(process.env.NEXT_PUBLIC_API_KEY); // Your secret API key
+
+      // const users = new sdk.Users(client);
+
+      //  const newUser = await users.create(
+      //   ID.unique(), 
+      //   email, 
+      //   phone, 
+      //   undefined, 
+      //   name)
+
+      const newUser = await createUser(userData);
+      console.log('onSubmit newUser:',newUser);
+
+      if (newUser) {
+        router.push(`/patients/${newUser.$id}/register`);
+      }
+    } catch (error) {
+      console.log('PatientForm onSubmit ERROR:',error);
+    }
+
+    setIsLoading(false);
   }
 
   return (
-    <div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 flex-1">
           <section className="mb-12 space-y-4">
@@ -86,10 +147,9 @@ const PatientForm = () => {
             iconAlt="phone"
           />
 
-          <Button type="submit">Submit</Button>
+          <SubmitButton isLoading={isLoading}>{t("Get Started")}</SubmitButton>
         </form>
       </Form>
-    </div>
   )
 }
 

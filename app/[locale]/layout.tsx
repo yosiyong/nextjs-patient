@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/components/ui/theme-provider";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import {getTranslations, unstable_setRequestLocale} from 'next-intl/server';
+import LocaleSwitcher from '@/components/LocaleSwitcher'
 
 const fontSans = Plus_Jakarta_Sans({ 
   subsets: ["latin"],

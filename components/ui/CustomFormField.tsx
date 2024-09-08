@@ -39,7 +39,7 @@ interface CustomProps {
 const RenderField = ({field, props}:{field:any, props: CustomProps}) => {
     const { fieldType, iconSrc, iconAlt, placeholder} = props;
     const locale = useLocale();
-    console.log('locale:',locale);
+    //console.log('locale:',locale);
     switch (props.fieldType) {
         case FormFieldType.INPUT:
           return (
