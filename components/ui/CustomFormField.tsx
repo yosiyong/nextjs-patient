@@ -11,13 +11,29 @@ import {
     FormMessage,
   } from "@/components/ui/form"
   import { Input } from "@/components/ui/input"
-import { FormFieldType } from "../forms/PatientForm"
+// import { FormFieldType } from "../forms/PatientForm"
 import Image from "next/image";
 
-import {useLocale} from 'next-intl';
+// import {useLocale} from 'next-intl';
 
 import 'react-phone-number-input/style.css'
 import PhoneInput from "react-phone-number-input";
+import DatePicker, { registerLocale, setDefaultLocale } from "react-datepicker";
+import {ja } from "date-fns/locale";
+import "react-datepicker/dist/react-datepicker.css";
+
+registerLocale('ja', ja);
+// registerLocale('en', en);
+
+export enum FormFieldType {
+  INPUT = "input",
+  TEXTAREA = "textarea",
+  PHONE_INPUT = "phoneInput",
+  CHECKBOX = "checkbox",
+  DATE_PICKER = "datePicker",
+  SELECT = "select",
+  SKELETON = "skeleton",
+}
 
 interface CustomProps {
     control: Control<any>;
@@ -32,15 +48,14 @@ interface CustomProps {
     children?: React.ReactNode;
     renderSkeleton?: (field: any) => React.ReactNode;
     fieldType: FormFieldType;
+    locale?:string;
   }
 
 
-
 const RenderField = ({field, props}:{field:any, props: CustomProps}) => {
-    const { fieldType, iconSrc, iconAlt, placeholder} = props;
-    const locale = useLocale();
-    //console.log('locale:',locale);
-    switch (props.fieldType) {
+    //const { fieldType, iconSrc, iconAlt, placeholder} = props;
+    //console.log({fieldType: props.fieldType, iconSrc: props.iconSrc, iconAlt: props.iconAlt, placeholder: props.placeholder, locale: props.locale}) ;
+     switch (props.fieldType) {
         case FormFieldType.INPUT:
           return (
             <div className="flex rounded-md border border-dark-500 bg-dark-400">
@@ -77,7 +92,7 @@ const RenderField = ({field, props}:{field:any, props: CustomProps}) => {
           return (
             <FormControl>
               <PhoneInput
-                defaultCountry={locale === 'ja'?"JP":"US"}
+                defaultCountry={props.locale === 'ja'?"JP":"US"}
                 placeholder={props.placeholder}
                 international
                 withCountryCallingCode
@@ -102,28 +117,29 @@ const RenderField = ({field, props}:{field:any, props: CustomProps}) => {
         //       </div>
         //     </FormControl>
         //   );
-        // case FormFieldType.DATE_PICKER:
-        //   return (
-        //     <div className="flex rounded-md border border-dark-500 bg-dark-400">
-        //       <Image
-        //         src="/assets/icons/calendar.svg"
-        //         height={24}
-        //         width={24}
-        //         alt="user"
-        //         className="ml-2"
-        //       />
-        //       <FormControl>
-        //         <ReactDatePicker
-        //           showTimeSelect={props.showTimeSelect ?? false}
-        //           selected={field.value}
-        //           onChange={(date: Date) => field.onChange(date)}
-        //           timeInputLabel="Time:"
-        //           dateFormat={props.dateFormat ?? "MM/dd/yyyy"}
-        //           wrapperClassName="date-picker"
-        //         />
-        //       </FormControl>
-        //     </div>
-        //   );
+        case FormFieldType.DATE_PICKER:
+          return (
+            <div className="flex rounded-md border border-dark-500 bg-dark-400">
+              <Image
+                src="/assets/icons/calendar.svg"
+                height={24}
+                width={24}
+                alt="user"
+                className="ml-2"
+              />
+              <FormControl>
+                <DatePicker
+                  showTimeSelect={props.showTimeSelect ?? false}
+                  selected={field.value}
+                  onChange={(date: Date) => field.onChange(date)}
+                  timeInputLabel="Time:"
+                  dateFormat={props.dateFormat ?? (props.locale === "ja" ? "yyyy/MM/dd" : "MM/dd/yyyy")}
+                  wrapperClassName="date-picker"
+                  locale={props.locale}
+                />
+              </FormControl>
+            </div>
+          );
         // case FormFieldType.SELECT:
         //   return (
         //     <FormControl>
@@ -139,8 +155,8 @@ const RenderField = ({field, props}:{field:any, props: CustomProps}) => {
         //       </Select>
         //     </FormControl>
         //   );
-        // case FormFieldType.SKELETON:
-        //   return props.renderSkeleton ? props.renderSkeleton(field) : null;
+        case FormFieldType.SKELETON:
+          return props.renderSkeleton ? props.renderSkeleton(field) : null;
         default:
           return null;
       }

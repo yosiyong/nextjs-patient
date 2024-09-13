@@ -7,14 +7,12 @@ import { z } from "zod"
 //formコントロール
 import { Form } from "@/components/ui/form"
 import CustomFormField from "../ui/CustomFormField"
-import { useTranslations } from "next-intl"
+import { useTranslations, useLocale } from "next-intl"
 import SubmitButton from "../ui/SubmitButton"
 import { useState } from "react"
 import { UserFormValidation } from "@/lib/validation"
 import { useRouter } from "next/navigation"
 import { createUser } from "@/lib/actions/patient.actions"
-import * as sdk from "node-appwrite";
-import { ID, Query } from "node-appwrite";
 
 export enum FormFieldType {
   INPUT = "input",
@@ -49,6 +47,7 @@ export enum FormFieldType {
 
 const PatientForm = () => {
   const t = useTranslations("common");
+  const locale = useLocale();
   const [isLoading, setIsLoading] = useState(false);
   // const formSchema = UserFormValidation(t);
   const router = useRouter();
@@ -97,7 +96,7 @@ const PatientForm = () => {
       console.log('onSubmit newUser:',newUser);
 
       if (newUser) {
-        router.push(`/patients/${newUser.$id}/register`);
+        router.push(`/${locale}/patients/${newUser.$id}/register`);
       }
     } catch (error) {
       console.log('PatientForm onSubmit ERROR:',error);
@@ -122,7 +121,7 @@ const PatientForm = () => {
             label={t('Full name')} 
             placeholder="John Doe" 
             iconSrc="/assets/icons/user.svg"
-            iconAlt="user"
+            iconAlt="user" 
           />
 
           {/* email */}
@@ -145,6 +144,7 @@ const PatientForm = () => {
             placeholder="(555) 123-1234" 
             iconSrc="/assets/icons/email.svg"
             iconAlt="phone"
+            locale={locale}
           />
 
           <SubmitButton isLoading={isLoading}>{t("Get Started")}</SubmitButton>

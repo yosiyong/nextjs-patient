@@ -12,11 +12,8 @@ export const {
 } = process.env;
 
 const client = new sdk.Client();
-console.log('NEXT_PUBLIC_ENDPOINT:',ENDPOINT);
-// console.log('NEXT_PUBLIC_PROJECT_ID:',NEXT_PUBLIC_PROJECT_ID);
-// console.log('NEXT_PUBLIC_API_KEY:',NEXT_PUBLIC_API_KEY);
-client.setEndpoint(ENDPOINT).setProject(NEXT_PUBLIC_PROJECT_ID).setKey(NEXT_PUBLIC_API_KEY);
-console.log('NEXT_PUBLIC_ENDPOINT2:',ENDPOINT);
+client.setEndpoint(ENDPOINT!).setProject(NEXT_PUBLIC_PROJECT_ID!).setKey(NEXT_PUBLIC_API_KEY!);
+
 export const databases = new sdk.Databases(client);
 export const users = new sdk.Users(client);
 export const messaging = new sdk.Messaging(client);

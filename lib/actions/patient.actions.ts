@@ -6,7 +6,7 @@ import { parseStringify } from "../utils"
 
 export const createUser = async (user: CreateUserParams) => {
     try {
-        console.log('createUser: users',users);
+        //console.log('createUser: users',users);
 
         const newUser = await users.create(
             ID.unique(), 
@@ -30,4 +30,14 @@ export const createUser = async (user: CreateUserParams) => {
         }
         console.error("An error occurred while creating a new user:", error);
       }
+}
+
+export const getUser = async (userId: string) => {
+  try {
+    const user = await users.get(userId);
+
+    return parseStringify(user);
+  } catch (error) {
+    console.log(error);
+  }
 }
