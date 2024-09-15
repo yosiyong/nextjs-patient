@@ -6,7 +6,7 @@ import { z } from "zod"
 
 //formコントロール
 import { Form } from "@/components/ui/form"
-import CustomFormField from "../ui/CustomFormField"
+import CustomFormField from "../CustomFormField"
 import { useTranslations, useLocale } from "next-intl"
 import SubmitButton from "../ui/SubmitButton"
 import { useState } from "react"
