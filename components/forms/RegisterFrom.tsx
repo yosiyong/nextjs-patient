@@ -12,7 +12,7 @@ import SubmitButton from "../ui/SubmitButton"
 import { useState } from "react"
 import { PatientFormValidation } from "@/lib/validation"
 import { useRouter } from "next/navigation"
-import { createUser } from "@/lib/actions/patient.actions"
+import { createUser, registerPatient } from "@/lib/actions/patient.actions"
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group"
 import { Doctors, getGenderOptions, IdentificationTypes, PatientFormDefaultValues } from "@/constants"
 import { Label } from "../ui/label"
@@ -31,8 +31,8 @@ const RegisterForm = ({user}:{user:User}) => {
   const GenderOptions = getGenderOptions(t);
   
   // 1. Define your form.
-  const form = useForm<z.infer<typeof PatientFormValidation>>({
-    resolver: zodResolver(PatientFormValidation),
+  const form = useForm<z.infer<ReturnType<typeof PatientFormValidation>>>({
+    resolver: zodResolver(PatientFormValidation(t)),
     defaultValues: {
       ...PatientFormDefaultValues,
       name: user.name,
@@ -42,12 +42,14 @@ const RegisterForm = ({user}:{user:User}) => {
   });
  
   // 2. Define a submit handler.
-  async function onSubmit(values: z.infer<typeof PatientFormValidation>) {
+  async function onSubmit(values: z.infer<ReturnType<typeof PatientFormValidation>>) {
      //入力されたformデータの検証
     setIsLoading(true);
     
      // Store file info in form data as
      let formData;
+
+     //身分証明書タイプ取得
      if (
        values.identificationDocument &&
        values.identificationDocument?.length > 0
@@ -88,7 +90,7 @@ const RegisterForm = ({user}:{user:User}) => {
         privacyConsent: values.privacyConsent,
       };
 
-      // const newPatient = await registerPatient(patient);
+      const newPatient = await registerPatient(patient);
 
       if (newPatient) {
         router.push(`/${locale}/patients/${user.$id}/new-appointment`);

@@ -24,26 +24,6 @@ export enum FormFieldType {
   SKELETON = "skeleton",
 }
 
-// //Zod schemaでformの形状を定義⇒validation.tsで定義
-// const formSchema = z.object({
-//   username: z.string().min(2, {
-//     message: "Username must be at least 2 characters.",
-//   }),
-// })
-
-// export const formSchema2 = (t: (key: string, options?: { field: string, length?: number }) => string) => {
-//   z.object({
-//       name: z
-//           .string()
-//           .min(2, t('validation.minLength',{ field: t('Name'), length: 2 }))
-//           .max(50, t('validation.maxLength', { field: t('Name'), length: 50 })),
-//       email: z.string().email(t('validation.invalid', { field: t('Email')})),
-//       phone: z
-//           .string()
-//           .refine((phone) => /^\+\d{10,15}$/.test(phone), t('validation.invalid', { field: 'Email'})),
-//   });
-// };
-
 
 const PatientForm = () => {
   const t = useTranslations("common");
@@ -53,8 +33,8 @@ const PatientForm = () => {
   const router = useRouter();
 
   // 1. Define your form.
-  const form = useForm<z.infer<typeof UserFormValidation>>({
-    resolver: zodResolver(UserFormValidation),
+  const form = useForm<z.infer<ReturnType<typeof UserFormValidation>>>({
+    resolver: zodResolver(UserFormValidation(t)),
     defaultValues: {
       name: "",
       email: "",
@@ -63,7 +43,7 @@ const PatientForm = () => {
   })
  
   // 2. Define a submit handler.
-  async function onSubmit({name, email, phone}: z.infer<typeof UserFormValidation>) {
+  async function onSubmit({name, email, phone}: z.infer<ReturnType<typeof UserFormValidation>>) {
      //入力されたformデータの検証
     setIsLoading(true);
     
